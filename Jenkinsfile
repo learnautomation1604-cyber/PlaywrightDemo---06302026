@@ -4,7 +4,6 @@ pipeline {
 
     tools {
         nodejs 'Node20'
-        allure 'Allure'
     }
 
     options {
@@ -23,6 +22,8 @@ pipeline {
             steps {
                 bat 'rmdir /s /q node_modules || exit 0'
                 bat 'del package-lock.json || exit 0'
+                bat 'rmdir /s /q allure-results || exit 0'
+                bat 'rmdir /s /q allure-report || exit 0'
             }
         }
 
@@ -52,14 +53,8 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // IMPORTANT: Allure results must be generated
+                // Generates allure-results automatically via reporter
                 bat 'npx playwright test --reporter=allure-playwright'
-            }
-        }
-
-        stage('Generate Allure Report') {
-            steps {
-                bat 'npx allure generate allure-results --clean -o allure-report'
             }
         }
 
@@ -101,8 +96,8 @@ pipeline {
                     archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
                 }
 
-                if (fileExists('allure-report')) {
-                    archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
+                if (fileExists('allure-results')) {
+                    archiveArtifacts artifacts: 'allure-results/**', fingerprint: true
                 }
             }
         }
