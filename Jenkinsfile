@@ -4,7 +4,6 @@ pipeline {
 
     tools {
         nodejs 'Node20'
-        allure 'Allure'
     }
 
     options {
