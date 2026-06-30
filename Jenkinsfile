@@ -20,10 +20,11 @@ pipeline {
 
         stage('Clean Workspace') {
             steps {
-                bat 'rmdir /s /q node_modules || exit 0'
-                bat 'del package-lock.json || exit 0'
-                bat 'rmdir /s /q allure-results || exit 0'
-                bat 'rmdir /s /q allure-report || exit 0'
+                bat 'if exist node_modules rmdir /s /q node_modules'
+                bat 'if exist package-lock.json del package-lock.json'
+                bat 'if exist allure-results rmdir /s /q allure-results'
+                bat 'if exist allure-report rmdir /s /q allure-report'
+                bat 'if exist playwright-report rmdir /s /q playwright-report'
             }
         }
 
@@ -57,6 +58,20 @@ pipeline {
             }
         }
 
+        stage('Generate Allure HTML Report') {
+            when {
+                expression {
+                    fileExists('allure-results')
+                }
+            }
+            steps {
+                script {
+                    def allureHome = tool 'Allure'
+                    bat "\"${allureHome}\\bin\\allure.bat\" generate allure-results --clean -o allure-report"
+                }
+            }
+        }
+
         stage('Publish Playwright HTML Report') {
             when {
                 expression {
@@ -74,14 +89,20 @@ pipeline {
             }
         }
 
-        stage('Publish Allure Report (Jenkins UI)') {
+        stage('Publish Allure HTML Report') {
             when {
                 expression {
-                    fileExists('allure-results')
+                    fileExists('allure-report/index.html')
                 }
             }
             steps {
-                echo 'Publishing Allure report via Jenkins plugin UI'
+                publishHTML(target: [
+                    reportDir: 'allure-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Allure HTML Report',
+                    keepAll: true,
+                    alwaysLinkToLastBuild: true
+                ])
             }
         }
     }
@@ -89,6 +110,7 @@ pipeline {
     post {
         always {
             script {
+
                 if (fileExists('playwright-report')) {
                     archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
                 }
@@ -98,7 +120,7 @@ pipeline {
                 }
 
                 if (fileExists('allure-report')) {
-                archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
+                    archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
                 }
             }
         }
