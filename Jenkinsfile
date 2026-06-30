@@ -19,7 +19,7 @@ pipeline {
                 bat 'where npm'
                 bat 'npm -v'
                 bat 'npx playwright --version'
-                bat 'npx tsc -v || echo TypeScript not found yet'
+                bat 'node node_modules/typescript/bin/tsc -v'
             }
         }
 
@@ -38,7 +38,8 @@ pipeline {
 
         stage('Install Packages') {
             steps {
-                bat 'npm ci'
+                bat 'npm ci --include=dev'
+                bat 'npm list typescript'
             }
         }
 
