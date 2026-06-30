@@ -1,18 +1,15 @@
 {
-  "name": "playwrightdemo",
-  "version": "1.0.0",
-  "description": "Playwright Automation with Jenkins",
-  "private": true,
-  "scripts": {
-    "test": "playwright test",
-    "test:headed": "playwright test --headed",
-    "test:debug": "playwright test --debug",
-    "report": "playwright show-report",
-    "install:browsers": "playwright install"
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node", "@playwright/test"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
   },
-  "devDependencies": {
-    "@playwright/test": "^1.61.1",
-    "@types/node": "^26.0.1",
-    "typescript": "^5.9.2"
-  }
+  "include": [
+    "playwright.config.ts",
+    "tests/**/*.ts"
+  ]
 }
