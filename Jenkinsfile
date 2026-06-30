@@ -6,6 +6,10 @@ pipeline {
         nodejs 'Node20'
     }
 
+    options {
+        skipDefaultCheckout(false)
+    }
+
     stages {
 
         stage('Verify Environment') {
@@ -15,10 +19,7 @@ pipeline {
                 bat 'where npm'
                 bat 'npm -v'
                 bat 'npx playwright --version'
-                bat 'npx tsc -v'
-                bat 'type package.json'
-                bat 'npm list typescript'
-                bat 'dir node_modules'
+                bat 'npx tsc -v || echo TypeScript not found yet'
             }
         }
 
@@ -28,9 +29,22 @@ pipeline {
             }
         }
 
+        stage('Clean Workspace') {
+            steps {
+                bat 'rmdir /s /q node_modules || exit 0'
+                bat 'del package-lock.json || exit 0'
+            }
+        }
+
         stage('Install Packages') {
             steps {
-                bat 'npm install'
+                bat 'npm ci'
+            }
+        }
+
+        stage('Force Install TypeScript (Safety Fix)') {
+            steps {
+                bat 'npm install typescript --save-dev'
             }
         }
 
