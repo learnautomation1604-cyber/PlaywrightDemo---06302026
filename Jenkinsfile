@@ -96,6 +96,10 @@ pipeline {
                 if (fileExists('allure-results')) {
                     archiveArtifacts artifacts: 'allure-results/**', fingerprint: true
                 }
+
+                if (fileExists('allure-report')) {
+                archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
+                }
             }
         }
 
