@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Playwright Automation with Jenkins",
   "private": true,
-  "type": "commonjs",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",

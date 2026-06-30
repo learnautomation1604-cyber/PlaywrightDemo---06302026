@@ -8,6 +8,17 @@ pipeline {
 
     stages {
 
+        stage('Verify Environment') {
+            steps {
+                bat 'where node'
+                bat 'node -v'
+                bat 'where npm'
+                bat 'npm -v'
+                bat 'npx playwright --version'
+                bat 'npx tsc -v'
+            }
+        }
+
         stage('Checkout') {
             steps {
                 checkout scm
@@ -33,6 +44,11 @@ pipeline {
         }
 
         stage('Publish Report') {
+            when {
+                expression {
+                    fileExists('playwright-report/index.html')
+                }
+            }
             steps {
                 publishHTML(target: [
                     reportDir: 'playwright-report',
@@ -47,7 +63,13 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'playwright-report/**'
+            script {
+                if (fileExists('playwright-report')) {
+                    archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+                } else {
+                    echo 'No Playwright report found to archive.'
+                }
+            }
         }
 
         success {
