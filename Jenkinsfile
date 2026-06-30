@@ -57,7 +57,7 @@ pipeline {
             }
         }
 
-        stage('Publish HTML Report') {
+        stage('Publish Playwright HTML Report') {
             when {
                 expression {
                     fileExists('playwright-report/index.html')
@@ -74,15 +74,14 @@ pipeline {
             }
         }
 
-        stage('Check Allure Results') {
-            steps {
-                script {
-                    if (fileExists('allure-results')) {
-                        echo 'Allure results found'
-                    } else {
-                        echo 'No Allure results found - skipping Allure publish'
-                    }
+        stage('Publish Allure Report (Jenkins UI)') {
+            when {
+                expression {
+                    fileExists('allure-results')
                 }
+            }
+            steps {
+                echo 'Publishing Allure report via Jenkins plugin UI'
             }
         }
     }
