@@ -4,6 +4,7 @@ pipeline {
 
     tools {
         nodejs 'Node20'
+        allure 'Allure'
     }
 
     options {
@@ -29,7 +30,6 @@ pipeline {
             steps {
                 bat 'npm cache clean --force'
                 bat 'npm install --include=dev'
-                bat 'npm list typescript'
             }
         }
 
@@ -52,11 +52,18 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                bat 'npx playwright test'
+                // IMPORTANT: Allure results must be generated
+                bat 'npx playwright test --reporter=allure-playwright'
             }
         }
 
-        stage('Publish Report') {
+        stage('Generate Allure Report') {
+            steps {
+                bat 'npx allure generate allure-results --clean -o allure-report'
+            }
+        }
+
+        stage('Publish HTML Report') {
             when {
                 expression {
                     fileExists('playwright-report/index.html')
@@ -72,6 +79,19 @@ pipeline {
                 ])
             }
         }
+
+        stage('Publish Allure Report') {
+            when {
+                expression {
+                    fileExists('allure-results')
+                }
+            }
+            steps {
+                allure([
+                    results: [[path: 'allure-results']]
+                ])
+            }
+        }
     }
 
     post {
@@ -79,8 +99,10 @@ pipeline {
             script {
                 if (fileExists('playwright-report')) {
                     archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
-                } else {
-                    echo 'No Playwright report found to archive.'
+                }
+
+                if (fileExists('allure-report')) {
+                    archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
                 }
             }
         }

@@ -4,7 +4,10 @@ export default defineConfig({
 
   reporter:[
     ['list'],
-    ['html', {open:'never'}]
+    ['allure-playwright',{
+      outputFolder:'allure-results'
+    }]
+    // ['html', {open:'never'}]
   ],
 
   use:{
