@@ -53,7 +53,6 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                // Generates allure-results automatically via reporter
                 bat 'npx playwright test --reporter=allure-playwright'
             }
         }
@@ -75,16 +74,15 @@ pipeline {
             }
         }
 
-        stage('Publish Allure Report') {
-            when {
-                expression {
-                    fileExists('allure-results')
-                }
-            }
+        stage('Check Allure Results') {
             steps {
-                allure([
-                    results: [[path: 'allure-results']]
-                ])
+                script {
+                    if (fileExists('allure-results')) {
+                        echo 'Allure results found'
+                    } else {
+                        echo 'No Allure results found - skipping Allure publish'
+                    }
+                }
             }
         }
     }
