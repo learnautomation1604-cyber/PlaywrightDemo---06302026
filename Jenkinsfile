@@ -47,8 +47,12 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'playwright-report/**'
+        script {
+            if (fileExists('playwright-report')) {
+                archiveArtifacts artifacts: 'playwright-report/**', fingerprint: true
+            }
         }
+    }
 
         success {
             echo 'Execution Successful'
