@@ -16,6 +16,9 @@ pipeline {
                 bat 'npm -v'
                 bat 'npx playwright --version'
                 bat 'npx tsc -v'
+                bat 'type package.json'
+                bat 'npm list typescript'
+                bat 'dir node_modules'
             }
         }
 
