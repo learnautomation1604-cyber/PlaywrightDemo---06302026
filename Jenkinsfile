@@ -35,6 +35,13 @@ pipeline {
             }
         }
 
+        stage('Install Allure CLI') {
+            steps {
+                bat 'npm install -g allure-commandline'
+                bat 'allure --version'
+            }
+        }
+
         stage('Verify Environment') {
             steps {
                 bat 'where node'
@@ -65,10 +72,7 @@ pipeline {
                 }
             }
             steps {
-                script {
-                    def allureHome = tool 'Allure'
-                    bat "\"${allureHome}\\bin\\allure.bat\" generate allure-results --clean -o allure-report"
-                }
+                bat 'allure generate allure-results --clean -o allure-report'
             }
         }
 
